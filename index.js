@@ -1,88 +1,29 @@
 const express = require("express");
-const app = express();
 const mongoose = require("mongoose");
-const Product = require("./models/product.model.js");
+require("dotenv").config();
 
+const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Import routes
+const productRoutes = require("./routes/product.routes.js");
+
+// Use routes
+app.use("/api/product", productRoutes);
+
 app.get("/", (req, res) => {
-  res.send("Hello this is from node");
-});
-
-app.get("/api/product", async (req, res) => {
-  try {
-    const products = await Product.find({});
-    res.status(200).json(products);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-app.get("/api/product/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const product = await Product.findById(id);
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-app.post("/api/product", async (req, res) => {
-  try {
-    const product = await Product.create(req.body);
-    res.status(200).json(product);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-//update products
-
-app.put("/api/product/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const product = await Product.findByIdAndUpdate(id, req.body);
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    const updatedProduct = await Product.findById(id);
-    res.status(200).json(updatedProduct);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
-
-//Delete products
-
-app.delete("/api/product/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-    const product = await Product.findByIdAndDelete(id);
-
-    if (!product) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    res.status(200).json({ message: "Product deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
+  res.send("Hello, this is from Node.js!");
 });
 
 mongoose
-  .connect(
-    "mongodb+srv://yashdhameliyacloudus24:cloudus2025@beckenddb.m2hbl.mongodb.net/Node-API?retryWrites=true&w=majority&appName=BeckendDB"
-  )
+  .connect(process.env.MONGO_URI)
   .then(() => {
-    console.log("Connected!");
+    console.log("Connected to MongoDB!");
     app.listen(5000, () => {
-      console.log("Server is running on 5000");
+      console.log("Server is running on port 5000");
     });
   })
-  .catch(() => {
-    console.log("Not Connected");
+  .catch((error) => {
+    console.log("Database connection failed:", error);
   });
