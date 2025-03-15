@@ -8,9 +8,13 @@ app.use(express.urlencoded({ extended: false }));
 
 // Import routes
 const productRoutes = require("./routes/product.routes.js");
+const authRoutes = require("./routes/auth.routes");
+const protectedRoutes = require("./routes/protected.routes");
 
 // Use routes
 app.use("/api/product", productRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api", protectedRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello, this is from Node.js!");
